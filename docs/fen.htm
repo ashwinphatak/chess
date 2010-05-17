@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en"><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="KEYWORDS" content="Forsyth-Edwards Notation">
+<meta name="robots" content="index,follow">
+<link rel="shortcut icon" href="http://en.wikipedia.org/favicon.ico">
+<link rel="copyright" href="http://www.gnu.org/copyleft/fdl.html"><title>Forsyth-Edwards Notation - Wikipedia, the free encyclopedia</title>
+    
+    <style type="text/css" media="screen,projection">/*<![CDATA[*/ @import "/skins-1.5/monobook/main.css"; /*]]>*/</style>
+    <link rel="stylesheet" type="text/css" href="fen_files/commonPrint.css"><!--[if lt IE 5.5000]><style type="text/css">@import "/skins-1.5/monobook/IE50Fixes.css";</style><![endif]--><!--[if IE 5.5000]><style type="text/css">@import "/skins-1.5/monobook/IE55Fixes.css";</style><![endif]--><!--[if gte IE 6]><style type="text/css">@import "/skins-1.5/monobook/IE60Fixes.css";</style><![endif]--><!--[if IE]><script type="text/javascript" src="/skins-1.5/common/IEFixes.js"></script>
+    <meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+    
+    
+    
+    
+    <script type="text/javascript" src="fen_files/index"></script>    <script type="text/javascript" src="fen_files/wikibits.js"></script>
+    <style type="text/css">/*<![CDATA[*/
+@import "/w/index.php?title=MediaWiki:Monobook.css&action=raw&ctype=text/css&smaxage=2678400";
+@import "/w/index.php?title=-&action=raw&gen=css&maxage=2678400";
+/*]]>*/</style></head>
+
+  <body class="ns-0">
+    <div id="globalWrapper">
+      <div id="column-content">
+	<div id="content">
+	  <a name="top" id="contentTop"></a>
+	  	  <h1 class="firstHeading">Forsyth-Edwards Notation</h1>
+	  <div id="bodyContent">
+	    <h3 id="siteSub">From Wikipedia, the free encyclopedia.</h3>
+	    <div id="contentSub"></div>
+	    	    	    <!-- start content -->
+	    <p><b>Forsyth-Edwards Notation</b> (<b>FEN</b>) is a standard <a href="http://en.wikipedia.org/wiki/Chess_notation" title="Chess notation">notation</a> for describing a particular board position of a <a href="http://en.wikipedia.org/wiki/Chess" title="Chess">Chess</a> game. The purpose of FEN notation is to provide all the necessary information to restart a game from a particular position.</p>
+<p>FEN is based on a system developed by the <a href="http://en.wikipedia.org/wiki/Scotland" title="Scotland">Scottish</a> newspaper journalist, <a href="http://en.wikipedia.org/wiki/David_Forsyth" title="David Forsyth">David Forsyth</a>. Forsyth's system became popular in the <a href="http://en.wikipedia.org/wiki/19th_century" title="19th century">19th century</a>; <a href="http://en.wikipedia.org/w/index.php?title=Steven_Edwards&amp;action=edit" class="new" title="Steven Edwards">Steven Edwards</a> extended it to support use by computers. FEN is an integral part of the <a href="http://en.wikipedia.org/wiki/Portable_Game_Notation" title="Portable Game Notation">Portable Game Notation</a>
+for chess games, since FEN is used to define initial positions other
+than the standard one. Notations such as FEN are critical for recording
+games in chess variants such as <a href="http://en.wikipedia.org/wiki/Fischer_Random_Chess" title="Fischer Random Chess">Fischer Random Chess</a> where the initial position is not necessarily the traditional initial position.</p>
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;action=edit&amp;section=1" title="Forsyth-Edwards Notation">edit</a>]</div>
+<p><a name="Definition" id="Definition"></a></p>
+<h2>Definition</h2>
+<p>A FEN "record" defines a particular game position, all in one text
+line and using only the ASCII character set. A text file with only FEN
+data records should have the file extension ".fen".</p>
+<p>A FEN record contains 6 fields. The separator between fields is a space. The fields are:</p>
+<ul>
+<li>Piece placement (from white's perspective). Each rank is described,
+starting with rank 8 and ending with rank 1; within each rank, the
+contents of each square are described from file a through file h. White
+pieces are designated using upper-case letters ("KQRBNP"), Black by
+lowercase ("kqrbnp"). Blank squares are noted using digits 1 through 8
+(the number of blank squares), and "/" separate ranks.</li>
+<li>Active color. "w" means white moves next, "b" means black.</li>
+<li><a href="http://en.wikipedia.org/wiki/Castling" title="Castling">Castling</a>
+availability. If neither side can castle, this is "-". Otherwise, this
+has one or more letters: "K" (White can castle kingside), "Q" (White
+can castle queenside), "k" (Black can castle kingside), and/or "q"
+(Black can castle queenside).</li>
+<li><a href="http://en.wikipedia.org/wiki/En_passant" title="En passant">En passant</a>
+target square. If there's no en passant target square, this is "-". If
+a pawn has just made a 2-square move, this is the position "behind" the
+pawn.</li>
+<li>Halfmove clock: This is the number of halfmoves since the last pawn
+advance or capture. This is used to determine if a draw can be claimed
+under the <a href="http://en.wikipedia.org/wiki/Fifty_move_rule" title="Fifty move rule">fifty move rule</a>.</li>
+<li>Fullmove number: The number of the full move. It starts at 1, and is incremented after Black's move.</li>
+</ul>
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;action=edit&amp;section=2" title="Forsyth-Edwards Notation">edit</a>]</div>
+<p><a name="Examples" id="Examples"></a></p>
+<h2>Examples</h2>
+<p>Here's the FEN for the starting position:</p>
+<pre>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+</pre>
+<p>Here is the FEN after the common move 1. e4:</p>
+<pre>rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+</pre>
+<p>And then after 1. ... c5:</p>
+<pre>rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2
+</pre>
+<p>And then after 2. Nf3:</p>
+<pre>rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2
+</pre>
+<div class="editsection" style="float: right; margin-left: 5px;">[<a href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;action=edit&amp;section=3" title="Forsyth-Edwards Notation">edit</a>]</div>
+<p><a name="External_References" id="External_References"></a></p>
+<h2>External References</h2>
+<ul>
+<li><a href="http://www.chessclub.com/help/PGN-spec" class="external text" title="http://www.chessclub.com/help/PGN-spec">Portable Game Notation Specification and Implementation Guide, Steven J. Edwards</a></li>
+</ul>
+
+
+<!-- Saved in parser cache with key enwiki:pcache:idhash:258696-0!1!0!0!!en!2 and timestamp 20050929005844 -->
+<div class="printfooter">
+Retrieved from "<a href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation">http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation</a>"</div>
+	    <div id="catlinks"><p class="catlinks"><a href="http://en.wikipedia.org/w/index.php?title=Special:Categories&amp;article=Forsyth-Edwards_Notation" title="Special:Categories">Categories</a>: <a href="http://en.wikipedia.org/wiki/Category:Chess_notation" title="Category:Chess notation">Chess notation</a> | <a href="http://en.wikipedia.org/wiki/Category:Computer_file_formats" title="Category:Computer file formats">Computer file formats</a></p></div>	    <!-- end content -->
+	    <div class="visualClear"></div>
+	  </div>
+	</div>
+      </div>
+      <div id="column-one">
+	<div id="p-cactions" class="portlet">
+	  <h5>Views</h5>
+	  <ul>
+	    <li id="ca-nstab-main" class="selected"><a title="View the content page [alt-c]" accesskey="c" href="http://en.wikipedia.org/wiki/Forsyth-Edwards_Notation">Article</a></li><li id="ca-talk"><a title="Discussion about the content page [alt-t]" accesskey="t" href="http://en.wikipedia.org/wiki/Talk:Forsyth-Edwards_Notation">Discussion</a></li><li id="ca-edit"><a title="You can edit this page. Please use the preview button before saving. [alt-e]" accesskey="e" href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;action=edit">Edit this page</a></li><li id="ca-history"><a title="Past versions of this page. [alt-h]" accesskey="h" href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;action=history">History</a></li>	  </ul>
+	</div>
+	<div class="portlet" id="p-personal">
+	  <h5>Personal tools</h5>
+	  <div class="pBody">
+	    <ul>
+	    <li id="pt-login"><a title="Logging in is not required, but brings many benefits. [alt-o]" accesskey="o" href="http://en.wikipedia.org/w/index.php?title=Special:Userlogin&amp;returnto=Forsyth-Edwards_Notation">Create account / log in</a></li>	    </ul>
+	  </div>
+	</div>
+	<div title="Main Page" class="portlet" id="p-logo">
+	  <a style="background-image: url(http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png);" href="http://en.wikipedia.org/wiki/Main_Page" title="Main Page"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+		<div class="portlet" id="p-navigation">
+	  <h5>Navigation</h5>
+	  <div class="pBody">
+	    <ul>
+	    	      <li id="n-mainpage"><a title="Visit the Main Page [alt-z]" accesskey="z" href="http://en.wikipedia.org/wiki/Main_Page">Main Page</a></li>
+	     	      <li title="About the project, what you can do, where to find things" id="n-portal"><a href="http://en.wikipedia.org/wiki/Wikipedia:Community_Portal">Community portal</a></li>
+	     	      <li title="Find background information on current events" id="n-currentevents"><a href="http://en.wikipedia.org/wiki/Current_events">Current events</a></li>
+	     	      <li id="n-recentchanges"><a title="List of recent changes in Wikipedia [alt-r]" accesskey="r" href="http://en.wikipedia.org/wiki/Special:Recentchanges">Recent changes</a></li>
+	     	      <li id="n-randompage"><a title="Load a random page [alt-x]" accesskey="x" href="http://en.wikipedia.org/wiki/Special:Random">Random article</a></li>
+	     	      <li title="The place to find out." id="n-help"><a href="http://en.wikipedia.org/wiki/Help:Contents">Help</a></li>
+	     	      <li id="n-contact"><a href="http://en.wikipedia.org/wiki/Wikipedia:Contact_us">Contact us</a></li>
+	     	      <li title="Support us" id="n-sitesupport"><a href="http://wikimediafoundation.org/wiki/Fundraising">Donations</a></li>
+	     	    </ul>
+	  </div>
+	</div>
+		<div id="p-search" class="portlet">
+	  <h5><label for="searchInput">Search</label></h5>
+	  <div class="pBody">
+	    <form name="searchform" action="/wiki/Special:Search" id="searchform">
+	      <input id="searchInput" name="search" accesskey="f" value="" type="text">
+	      <input name="go" class="searchButton" id="searchGoButton" value="Go" type="submit">&nbsp;<input name="fulltext" class="searchButton" value="Search" type="submit">
+	    </form>
+	  </div>
+	</div>
+	<div class="portlet" id="p-tb">
+	  <h5>Toolbox</h5>
+	  <div class="pBody">
+	    <ul>
+		  		  <li id="t-whatlinkshere"><a title="List of all wiki pages that link here [alt-j]" accesskey="j" href="http://en.wikipedia.org/wiki/Special:Whatlinkshere/Forsyth-Edwards_Notation">What links here</a></li>
+		  		  <li id="t-recentchangeslinked"><a title="Recent changes in pages linked from this page [alt-k]" accesskey="k" href="http://en.wikipedia.org/wiki/Special:Recentchangeslinked/Forsyth-Edwards_Notation">Related changes</a></li>
+		                	      	      	      	      	      	      	      <li id="t-upload"><a title="Upload images or media files [alt-u]" accesskey="u" href="http://en.wikipedia.org/wiki/Special:Upload">Upload file</a></li>	      	      <li id="t-specialpages"><a title="List of all special pages [alt-q]" accesskey="q" href="http://en.wikipedia.org/wiki/Special:Specialpages">Special pages</a></li>	      	      	      <li id="t-print"><a href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;printable=yes&amp;printable=yes">Printable version</a></li>
+		  	      	      <li id="t-permalink"><a href="http://en.wikipedia.org/w/index.php?title=Forsyth-Edwards_Notation&amp;oldid=23033786">Permanent link</a></li>
+		  	    </ul>
+	  </div>
+	</div>
+	<div id="p-lang" class="portlet">
+	  <h5>In other languages</h5>
+	  <div class="pBody">
+	    <ul>
+	      	      <li class="interwiki-sl">
+	      <a href="http://sl.wikipedia.org/wiki/Forsyth-Edwardsov_zapis">Slovenščina</a>
+	      </li>
+	      	      <li class="interwiki-eo">
+	      <a href="http://eo.wikipedia.org/wiki/FEN">Esperanto</a>
+	      </li>
+	      	    </ul>
+	  </div>
+	</div>
+	      </div><!-- end of the left (by default at least) column -->
+      <div class="visualClear"></div>
+      <div id="footer">
+    <div id="f-poweredbyico"><a href="http://www.mediawiki.org/"><img src="fen_files/poweredby_mediawiki_88x31.png" alt="MediaWiki"></a></div>	<div id="f-copyrightico"><a href="http://wikimediafoundation.org/"><img src="fen_files/Wikimedia-button1.png" alt="Wikimedia Foundation" border="0"></a></div>	<ul id="f-list">
+	  <li id="f-lastmod"> This page was last modified 11:07, 11 September 2005.</li>	  	  	  	  <li id="f-copyright">All text is available under the terms of the <a class="internal" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License">GNU Free Documentation License</a> (see <b><a class="internal" href="http://en.wikipedia.org/wiki/Wikipedia:Copyrights">Copyrights</a></b> for details).<br></li>	  <li id="f-about"><a href="http://en.wikipedia.org/wiki/Wikipedia:About" title="Wikipedia:About">About Wikipedia</a></li>	  <li id="f-disclaimer"><a href="http://en.wikipedia.org/wiki/Wikipedia:General_disclaimer" title="Wikipedia:General disclaimer">Disclaimers</a></li>	  	</ul>
+      </div>
+    </div>
+    <!-- Served by srv47 in 0.16 secs. -->  </body></html>

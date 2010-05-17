@@ -1,0 +1,39 @@
+$ time ./test_moves.exe
+---brrb- [White]
+--N----B [-]
+-------- [----]
+--p----Q
+--p--k--
+-----P--
+----P-KR
+--N--RB-
+
+h2-h1 e8-e7 h1-h4+
+Positions evaluated: 7140
+Moves generated: 124959
+
+real    0m3.462s
+user    0m3.483s
+sys     0m0.015s
+
+
+
+
+$ time ./test_moves.exe
+---brrb- [White]
+--N----B [-]
+-------- [----]
+--p----Q
+--p--k--
+-----P--
+----P-KR
+--N--RB-
+
+Starting search...
+Search = 32767: h2-h1 d8xc7 h1-h4+
+Positions evaluated: 1642
+Moves generated: 29396
+
+real    0m0.834s
+user    0m0.843s
+sys     0m0.000s

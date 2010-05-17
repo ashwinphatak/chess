@@ -1,0 +1,54 @@
+Normal			 A1H8
+---------------		 ---------------
+ 0   1   2   3		  3   6   9  12
+
+ 4   5   6   7		 (0) (7  10  13)
+
+ 8   9  10  11		 (2   5   8)(15)
+
+12  13  14  15		 (1   4)(11  14)
+
+				      
+Rotate					 Unrotate     
+------					 --------     
+for(i = 0; i < 16; i++) {		 for(i = 0; i < 16; i++) {     
+ if bit a1h8[i] is set in oldBitboard	 if bit i is set in rotBitboard	
+	set bit i in newBitboard	 set bit a1h8[i] in unRotBitboard     
+}					 }
+
+
+Given a square, isolating its diagonal
+---------------------------------------
+
+bitboard diag[16] = {
+
+ 3,   6,   9,  12,
+
+ 0,   7,  10,  13,
+
+ 2,   5,   8,  15,
+
+ 1,   4,  11 , 14
+
+};
+
+int isolate[16][2] = {					    int new_sq[16] = {
+    { 4,  0x1},  {12, 0x3},  { 8,  0x7}, { 0,  0xf},	        0, 0, 0, 0,
+    {12, 0x3},   { 8,  0x7}, { 0,  0xf}, { 4,  0xe},	        1, 1, 1, 1,
+    { 8,  0x7},  { 0,  0xf}, { 4,  0xe}, { 12, 0xc},            2, 2, 2, 2,
+    { 0,  0xf},  { 4,  0xe}, {12, 0xc},  { 8, 0x8},	        3, 3, 3, 3,
+};							    };
+
+void init_a1h8(void)
+{
+    int i, j;
+    int state;
+    //a1h8 [i] [j mask] = f[0-4] j: mask, shift, unrotate
+    for(i = 0; i < 16; i++) {
+        for(j = 0; j < 16; j++) {
+            state = j & isolate[i][1];
+            _a1h8[i][state] = unRotate(
+            	(_horz[new_sq[i]][j] & isolate[i][1]) << isolate[i][0]);
+        }
+    }
+}

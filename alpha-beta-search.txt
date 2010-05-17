@@ -1,0 +1,15 @@
+evaluate (node, alpha, beta)
+    if node is a leaf
+        return the heuristic value of node
+    if node is a minimizing node
+        for each child of node
+            beta = min (beta, evaluate (child, alpha, beta))
+            if beta <= alpha
+                return alpha
+        return beta
+    if node is a maximizing node
+        for each child of node
+            alpha = max (alpha, evaluate (child, alpha, beta))
+            if beta <= alpha
+                return beta
+        return alpha

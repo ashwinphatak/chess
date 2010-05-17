@@ -1,0 +1,32 @@
+Pawn moves
+
+1) Captures
+
+	000
+	101  pawns & opponent pieces
+	010
+
+2) Advance
+	
+	010
+	010  pawn & all pieces
+	010
+
+if advance = 1 is possible only then consider advance = 2
+
+
+3) Double advance
+
+
+4) En passant
+
+ x = ep square, value is 0
+
+	000
+	1x1	_mask[x] & pawns
+	000
+
+5) Promotion
+
+	
+

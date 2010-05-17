@@ -1,0 +1,768 @@
+Index: diff.txt
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/diff.txt,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 diff.txt
+--- diff.txt	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ diff.txt	10 Oct 2005 12:42:53 -0000
+@@ -1,272 +0,0 @@
+-Index: src/bitboard.c
+-===================================================================
+-RCS file: /cygdrive/e/Ashwin/Area/CVSROOT/chess/src/bitboard.c,v
+-retrieving revision 1.8
+-diff -u -r1.8 bitboard.c
+---- src/bitboard.c	3 Oct 2005 07:14:38 -0000	1.8
+-+++ src/bitboard.c	4 Oct 2005 10:53:12 -0000
+-@@ -27,6 +27,7 @@
+- bitboard _knight[64];
+- bitboard _horz[64][256];
+- bitboard _vert[64][256];
+-+bitboard _a1h8[64][256];
+- 
+- /* Lookup table used for bitboard rotation */
+- const int _rotate[64] = {
+-@@ -40,13 +41,48 @@
+-      7, 15, 23, 31, 39, 47, 55, 63,
+- };
+- 
+-+
+-+const int _rot_a1h8[64] =  {
+-+    7, 14, 21, 28, 35, 42, 49, 56,
+-+    6, 13, 20, 27, 34, 41, 48, 63,
+-+    0, 15, 22, 29, 36, 43, 50, 57,
+-+    1,  8, 23, 30, 37, 44, 51, 58,
+-+    5, 12, 19, 26, 33, 40, 55, 62,
+-+    2,  9, 16, 31, 38, 45, 52, 59,
+-+    4, 11, 18, 25, 32, 47, 54, 61,
+-+};
+-+
+-+const int _a1h8_shiftMask[64][2] = {
+-+    {16, 0x1}, {24, 0x3}, {40, 0x7}, {56, 0xf}, {48, 0x1f}, {32, 0x3f}, {8, 0x7f}, {0, 0xff},
+-+    {24, 0x3}, {40, 0x7}, {56, 0xf}, {48, 0x1f}, {32, 0x3f}, {8, 0x7f}, {0, 0xff}, {16, 0xfe},
+-+    {40, 0x7}, {56, 0xf}, {48, 0x1f}, {32, 0x3f}, {8, 0x7f}, {0, 0xff}, {16, 0xfe}, {24, 0xfc},
+-+    {56, 0xf}, {48, 0x1f}, {32, 0x3f}, {8, 0x7f}, {0, 0xff}, {16, 0xfe}, {24, 0xfc}, {40, 0xf8},
+-+    {48, 0x1f}, {32, 0x3f}, {8, 0x7f}, {0, 0xff}, {16, 0xfe}, {24, 0xfc}, {40, 0xf8}, {56, 0xf0},
+-+    {32, 0x3f}, {8, 0x7f}, {0, 0xff}, {16, 0xfe}, {24, 0xfc}, {40, 0xf8}, {56, 0xf0}, {48, 0xe0},
+-+    {8, 0x7f}, {0, 0xff}, {16, 0xfe}, {24, 0xfc}, {40, 0xf8}, {56, 0xf0}, {48, 0xe0}, {32, 0xc0},
+-+    {0, 0xff}, {16, 0xfe}, {24, 0xfc}, {40, 0xf8}, {56, 0xf0}, {48, 0xe0}, {32, 0xc0}, {8, 0x80},
+-+};
+-+
+-+const int _a1h8_sq[64] = {
+-+    0, 0, 0, 0, 0, 0, 0, 0,
+-+    1, 1, 1, 1, 1, 1, 1, 1,
+-+    2, 2, 2, 2, 2, 2, 2, 2,
+-+    3, 3, 3, 3, 3, 3, 3, 3,
+-+    4, 4, 4, 4, 4, 4, 4, 4,
+-+    5, 5, 5, 5, 5, 5, 5, 5,
+-+    6, 6, 6, 6, 6, 6, 6, 6,
+-+    7, 7, 7, 7, 7, 7, 7, 7,
+-+};
+-+
+- /* These functions are not needed by anyone outside the file */
+- static void init_mask(void);
+- static void init_king(void);
+- static void init_knight(void);
+- static void init_horz(void);
+- static void init_vert(void);
+-+static void init_a1h8(void);
+- static bitboard horz_slide(int pos, int state);
+-+static bitboard unrotate_a1h8(bitboard x);
+- 
+- void init(void)
+- {
+-@@ -55,6 +91,7 @@
+-     init_knight();
+-     init_horz();
+-     init_vert();
+-+    init_a1h8();
+- }
+- 
+- bitboard rotate(bitboard b)
+-@@ -65,13 +102,43 @@
+-     for(i = 63; i >= 0; i--) {
+-         if(b & _mask[i]) {
+-             /* This 'if' statement looks rather inelegant. How to remove it? */
+--            r |= _mask[_rotate[i]];
+-+            SET_BIT(r, _rotate[i]);
+-         }
+-     }
+- 
+-     return r;
+- }
+- 
+-+
+-+bitboard rotate_a1h8(bitboard x)
+-+{
+-+    bitboard y = 0;
+-+    int i;
+-+
+-+    for(i = 63; i >=0; i--) {
+-+        if(x & _mask[_rot_a1h8[i]]) {
+-+            SET_BIT(y, i);
+-+        }
+-+    }
+-+
+-+    return y;
+-+}
+-+
+-+static bitboard unrotate_a1h8(bitboard x)
+-+{
+-+    bitboard y = 0;
+-+    int i;
+-+
+-+    for(i = 63; i >=0; i--) {
+-+        if(x & _mask[i]) {
+-+            SET_BIT(y, _rot_a1h8[i]);
+-+        }
+-+    }
+-+
+-+    return y;
+-+}
+-+
+-+
+- static void init_mask(void)
+- {
+-     bitboard b = 1;
+-@@ -265,3 +332,15 @@
+-     }
+- }
+- 
+-+static void init_a1h8(void)
+-+{
+-+    int i, j;
+-+    int state;
+-+    for(i = 0; i < 64; i++) {
+-+        for(j = 0; j < 256; j++) {
+-+            state = j & _a1h8_shiftMask[i][MASK];
+-+            _a1h8[i][state] = unrotate_a1h8(
+-+                (_horz[_a1h8_sq[i]][j] & _a1h8_shiftMask[i][MASK]) << _a1h8_shiftMask[i][SHIFT]);
+-+        }
+-+    }
+-+}
+-Index: src/bitboard.h
+-===================================================================
+-RCS file: /cygdrive/e/Ashwin/Area/CVSROOT/chess/src/bitboard.h,v
+-retrieving revision 1.7
+-diff -u -r1.7 bitboard.h
+---- src/bitboard.h	3 Oct 2005 07:14:38 -0000	1.7
+-+++ src/bitboard.h	4 Oct 2005 10:52:56 -0000
+-@@ -28,6 +28,12 @@
+- #define FILE_STATE(rotb, file) (( (rotb) >> ((file) << 3)) & 0xff)
+- 
+- 
+-+#define SHIFT 0
+-+#define MASK 1
+-+
+-+#define A1H8_STATE(rotb, sq) ((rotb >> _a1h8_shiftMask[sq][SHIFT]) & _a1h8_shiftMask[sq][MASK])
+-+
+-+
+- #ifdef LINUX
+- 
+- /* 64-bit unsigned data type */
+-@@ -51,5 +57,7 @@
+-  */
+- bitboard rotate(bitboard);
+- 
+-+bitboard rotate_a1h8(bitboard x);
+-+
+- #endif
+- 
+-Index: src/move.c
+-===================================================================
+-RCS file: /cygdrive/e/Ashwin/Area/CVSROOT/chess/src/move.c,v
+-retrieving revision 1.13
+-diff -u -r1.13 move.c
+---- src/move.c	3 Oct 2005 10:37:48 -0000	1.13
+-+++ src/move.c	4 Oct 2005 11:19:03 -0000
+-@@ -17,6 +17,7 @@
+- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+- */
+- 
+-+#include <stdio.h>
+- #include <assert.h>
+- #include "bitboard.h"
+- #include "position.h"
+-@@ -27,6 +28,8 @@
+- extern const bitboard _knight[64];
+- extern const bitboard _horz[64][256];
+- extern const bitboard _vert[64][256];
+-+extern const bitboard _a1h8[64][256];
+-+extern const int _a1h8_shiftMask[64][2];
+- 
+- /* Move storage.
+-  */
+-@@ -47,10 +50,14 @@
+-     int opponent;
+-     bitboard pieces;
+- 
+-+    opponent = OPPONENT(player);
+-+
+-     /* opponent in check = player won. should be checked somewhere before this */
+-     assert(!inCheck(pos, opponent));
+- 
+--    opponent = OPPONENT(player);
+-+
+-+
+-+
+- 
+-     pieces = getPieceBitboard(pos, piece);
+- 
+-@@ -123,6 +130,7 @@
+-     int rank;
+-     int file;
+-     bitboard rotAllPieces = 0;
+-+    bitboard rot_a1h8_allPieces = 0;
+- 
+-     if(IS_KING(piece)) {
+-         attackRange = _king[sq];
+-@@ -134,7 +142,14 @@
+-         attackRange = _knight[sq];
+-     }
+-     else if(IS_BISHOP(piece)) {
+--        /* TODO: bishop attacks */
+-+        rot_a1h8_allPieces = rotate_a1h8(allPieces);
+-+        state = A1H8_STATE(rot_a1h8_allPieces, sq);
+-+        attackRange = _a1h8[sq][state];
+-+
+-+        /*rotAllPieces = rotate(allPieces);
+-+        state = FILE_STATE(rotAllPieces, file);
+-+
+-+        attackRange |= _vert[sq][state];*/
+-     }
+-     else if(IS_ROOK(piece)) {
+-         rank = sq / 8;
+-@@ -447,7 +462,6 @@
+-         return 1;
+-     }
+- 
+--
+-     /* opponent knight attacks */
+-     knights = pos->knights[opponent];
+-     sq = 0;
+-@@ -468,6 +482,7 @@
+- 
+-     allPieces = pos->pieces[WHITE] | pos->pieces[BLACK];
+- 
+-+
+-     /* rook and queen attacks */
+-     rooks = pos->rooks[opponent] | pos->queens[opponent];
+-     sq = 0;
+-@@ -492,5 +507,6 @@
+-     }
+- 
+- 
+-+
+-     return 0;
+- }
+-Index: test/test_moves.c
+-===================================================================
+-RCS file: /cygdrive/e/Ashwin/Area/CVSROOT/chess/test/test_moves.c,v
+-retrieving revision 1.6
+-diff -u -r1.6 test_moves.c
+---- test/test_moves.c	3 Oct 2005 10:38:39 -0000	1.6
+-+++ test/test_moves.c	4 Oct 2005 11:18:39 -0000
+-@@ -34,13 +34,14 @@
+-     position pos;
+- 
+-     /* sample FEN */
+--    char test1[] = "8/1n6/4K1k1/8/8/8/1RR5/8 w - -";
+-+    char test1[] = "8/1n6/B3K1k1/8/8/8/1RR5/8 w - -";
+- 
+-     init();
+- 
+-+
+-     loadPositionFromFEN(test1, &pos);
+- 
+--    n = getMoves(&pos, WHITE, WHITE_ROOK, NORMAL, &_moveStore[0][0]);
+-+    n = getMoves(&pos, WHITE, WHITE_BISHOP, CAPTURE, &_moveStore[0][0]);
+-     fprintf(stderr, "Number of moves: %d\n", n);
+- 
+-     for(i = 0; i < n; i++) {
+Index: src/diag.c
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/src/diag.c,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 diag.c
+--- src/diag.c	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ src/diag.c	10 Oct 2005 12:19:54 -0000
+@@ -102,7 +102,7 @@
+         }
+ 
+         /* fputc(' ', stderr); */
+-        
++
+         if(sq % 8 == 0) {
+             if(56 == sq) {
+                 if(WHITE == pos->toPlay) {
+@@ -160,7 +160,7 @@
+ void printMove(const move * const m)
+ {
+     char piece;
+-    
++
+     if(IS_CASTLE(m)) {
+         if(1 == m->to || 57 == m->to) {
+             fprintf(stderr, "0-0");
+@@ -170,11 +170,11 @@
+         }
+     }
+     else {
+-        fprintf(stderr, "%c%c%c%c", FILE_NOTATION(m->from),
++        fprintf(stderr, "%c%c-%c%c", FILE_NOTATION(m->from),
+                             RANK_NOTATION(m->from),
+                             FILE_NOTATION(m->to),
+                             RANK_NOTATION(m->to));
+-                            
++
+         if(IS_PROMOTION(m)) {
+             if(IS_KNIGHT(m->promoteTo)) {
+                 piece = 'N';
+@@ -188,14 +188,14 @@
+             else if(IS_QUEEN(m->promoteTo)) {
+                 piece = 'Q';
+             }
+-        
+-            fprintf(stderr, "=%c", piece); 
+-        }                        
++
++            fprintf(stderr, "=%c", piece);
++        }
+     }
+-    
++
+     if(IS_CHECK(m)) {
+-        fprintf(stderr, "+"); 
++        fprintf(stderr, "+");
+     }
+-    
++
+     fprintf(stderr, "[%d]", m->eval);
+ }
+Index: src/move.c
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/src/move.c,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 move.c
+--- src/move.c	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ src/move.c	10 Oct 2005 12:19:27 -0000
+@@ -55,6 +55,70 @@
+ static void getCastlingMoves(const position * const pos, const int player, move store[], int *numMoves);
+ static void moveCastlingExtra(position *pos, const move * const m);
+ 
++int getAllMoves(const position * const pos, const int player, const int storeIndex)
++{
++    int numMoves = 0;
++    int i;
++    int j;
++    move temp;
++
++    if(WHITE == player) {
++        numMoves += getMoves(pos, player, WHITE_KING, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_PAWN, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_KNIGHT, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_BISHOP, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_ROOK, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_QUEEN, CAPTURE, &_moveStore[storeIndex][numMoves]);
++
++        numMoves += getMoves(pos, player, WHITE_KING, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_PAWN, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_KNIGHT, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_BISHOP, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_ROOK, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, WHITE_QUEEN, NORMAL, &_moveStore[storeIndex][numMoves]);
++    }
++    else {
++        numMoves += getMoves(pos, player, BLACK_KING, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_PAWN, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_KNIGHT, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_BISHOP, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_ROOK, CAPTURE, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_QUEEN, CAPTURE, &_moveStore[storeIndex][numMoves]);
++
++        numMoves += getMoves(pos, player, BLACK_KING, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_PAWN, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_KNIGHT, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_BISHOP, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_ROOK, NORMAL, &_moveStore[storeIndex][numMoves]);
++        numMoves += getMoves(pos, player, BLACK_QUEEN, NORMAL, &_moveStore[storeIndex][numMoves]);
++    }
++
++    if(0 == numMoves) { /* no moves */
++        if(inCheck(pos, player, pos->kingSquare[player])) {
++            return LOST;
++        }
++        else {
++            return STALEMATE;
++        }
++    }
++    else {
++        /* sort the moves according to evaluation */
++        for(i = numMoves - 1; i >= 0; i--) {
++            for(j = 1; j <= i; j++) {
++                if(_moveStore[storeIndex][j - 1].eval < _moveStore[storeIndex][j].eval) {
++                    /* swap the moves */
++                    temp = _moveStore[storeIndex][j];
++                    _moveStore[storeIndex][j] = _moveStore[storeIndex][j - 1];
++                    _moveStore[storeIndex][j - 1] = temp;
++                }
++            }
++        }
++
++    }
++
++    return numMoves;
++}
++
+ 
+ int getMoves(const position * const pos, const int player, const int piece, const int type, move store[])
+ {
+@@ -240,6 +304,7 @@
+     int numMoves = 0;
+     int target = 0;
+     move m;
++    move temp;
+     int valueCaptured;
+     int valueThis;
+ 
+@@ -256,7 +321,7 @@
+                 m.flags |=  CAPTURE;
+             }
+ 
+-            
++
+             if(target == pos->epSquare) { /* deal with en passant */
+                 m.flags |= EN_PASSANT;
+                 m.promoteTo = 0;
+@@ -267,7 +332,7 @@
+                 else {
+                     m.capturedPiece = WHITE_PAWN;
+                 }
+-                
++
+                 m.eval += WHITE_PAWN; /* worth one pawn */
+             }
+             else {
+@@ -277,7 +342,7 @@
+                 /* following logic works even if non-capture, i.e. to square is empty */
+                 valueCaptured = abs(m.capturedPiece);
+                 valueThis = abs(m.thisPiece);
+-                
++
+                 m.eval += valueCaptured;
+                 if(valueCaptured > valueThis) {
+                     m.eval += valueCaptured - valueThis;
+@@ -288,23 +353,28 @@
+             if(IS_PAWN(m.thisPiece) && IS_PROMOTION_SQUARE(player, m.to)) {
+                 m.flags |= PROMOTION;
+ 
++                temp = m;
++
+                 if(WHITE == player) {
+                     /* promote to queen */
+                     m.promoteTo = WHITE_QUEEN;
+                     m.eval += WHITE_QUEEN;
+-                    
++
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to rook */
+                     m.promoteTo = WHITE_ROOK;
+                     m.eval += WHITE_ROOK;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to bishop */
+                     m.promoteTo = WHITE_BISHOP;
+                     m.eval += WHITE_BISHOP;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to knight */
+                     m.promoteTo = WHITE_KNIGHT;
+                     m.eval += WHITE_KNIGHT;
+@@ -315,14 +385,17 @@
+                     m.promoteTo = BLACK_QUEEN;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to rook */
+                     m.promoteTo = BLACK_ROOK;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to bishop */
+                     m.promoteTo = BLACK_BISHOP;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+ 
++                    m = temp;
+                     /* promote to knight */
+                     m.promoteTo = BLACK_KNIGHT;
+                     storeMoveIfLegal(pos, &m, player, store, &numMoves);
+@@ -336,7 +409,7 @@
+         rawMoves = rawMoves >> 1;
+         target++;
+     }
+-    
++
+     /* castling */
+     if(NORMAL == type && IS_KING(pos->board[sq])) {
+         getCastlingMoves(pos, player, store, &numMoves);
+@@ -350,7 +423,7 @@
+     int colour;
+     int sq;
+     move m;
+-    
++
+     sq = pos->kingSquare[player];
+     colour = COLOUR(pos->board[sq]);
+ 
+@@ -360,7 +433,7 @@
+     m.promoteTo = 0;
+     m.capturedPiece = 0;
+     m.eval = 0;
+-    
++
+     if(WHITE == player && !inCheck(pos, WHITE, pos->kingSquare[WHITE])) {
+         if((pos->castleFlags & CASTLE_WK) && (0 == pos->board[1]) && (0 == pos->board[2])) {
+               if(!inCheck(pos, WHITE, 1) && !inCheck(pos, WHITE, 2)) {
+@@ -368,7 +441,7 @@
+                     storeMoveIfLegal(pos, &m, WHITE, store, numMoves);
+               }
+         }
+-        
++
+         if((pos->castleFlags & CASTLE_WQ) && (0 == pos->board[4]) && (0 == pos->board[5]) && (0 == pos->board[6])) {
+               if(!inCheck(pos, WHITE, 4) && !inCheck(pos, WHITE, 5)) {
+                     m.to = 5;
+@@ -383,7 +456,7 @@
+                     storeMoveIfLegal(pos, &m, BLACK, store, numMoves);
+               }
+         }
+-        
++
+         if((pos->castleFlags & CASTLE_BQ) && (0 == pos->board[62]) && (0 == pos->board[61]) && (0 == pos->board[60])) {
+               if(!inCheck(pos, BLACK, 61) && !inCheck(pos, BLACK, 60)) {
+                     m.to = 61;
+@@ -406,13 +479,13 @@
+         /* check that the move does not put players king in check, which would be illegal */
+         if(!inCheck(&newPosition, player, pos->kingSquare[player])) {
+             /* calculate evaluation */
+-            
++
+             opponent = OPPONENT(player);
+             if(inCheck(&newPosition, opponent, pos->kingSquare[opponent])) {
+                 m->flags |= CHECK;
+-                m->eval += 100;
++                m->eval += EVAL_CHECK;
+             }
+-            
++
+             store[(*numMoves)++] = *m;
+         }
+     }
+@@ -577,7 +650,7 @@
+         pos->board[0] = 0;
+         CLR_BIT(pos->pieces[WHITE], 0);
+         CLR_BIT(pos->rooks[WHITE], 0);
+-        
++
+         pos->board[2] = WHITE_ROOK;
+         SET_BIT(pos->pieces[WHITE], 2);
+         SET_BIT(pos->rooks[WHITE], 2);
+@@ -586,7 +659,7 @@
+         pos->board[7] = 0;
+         CLR_BIT(pos->pieces[WHITE], 7);
+         CLR_BIT(pos->rooks[WHITE], 7);
+-        
++
+         pos->board[4] = WHITE_ROOK;
+         SET_BIT(pos->pieces[WHITE], 4);
+         SET_BIT(pos->rooks[WHITE], 4);
+@@ -595,7 +668,7 @@
+         pos->board[56] = 0;
+         CLR_BIT(pos->pieces[BLACK], 56);
+         CLR_BIT(pos->rooks[BLACK], 56);
+-        
++
+         pos->board[58] = BLACK_ROOK;
+         SET_BIT(pos->pieces[BLACK], 58);
+         SET_BIT(pos->rooks[BLACK], 58);
+@@ -604,7 +677,7 @@
+         pos->board[63] = 0;
+         CLR_BIT(pos->pieces[BLACK], 63);
+         CLR_BIT(pos->rooks[BLACK], 63);
+-        
++
+         pos->board[60] = BLACK_ROOK;
+         SET_BIT(pos->pieces[BLACK], 60);
+         SET_BIT(pos->rooks[BLACK], 60);
+@@ -639,7 +712,7 @@
+         if(IS_CASTLE(m)) {
+             moveCastlingExtra(pos, m);
+         }
+-        
++
+         /* king has moved, cannot castle now */
+         castleBits = CASTLE_BITS(player);
+         pos->castleFlags &= ~castleBits;
+@@ -747,16 +820,16 @@
+     bitboard target;
+ 
+     /* should be used only for kings or empty squares */
+-    assert(((targetSquare == pos->kingSquare[player])) || 
++    assert(((targetSquare == pos->kingSquare[player])) ||
+         ((_mask[targetSquare] & (pos->pieces[WHITE] | pos->pieces[BLACK])) == 0));
+-    
++
+     if(targetSquare == pos->kingSquare[player]) {
+         target = pos->king[player];
+     }
+     else {
+         target = _mask[targetSquare];
+     }
+-    
++
+     /* opponent king attacks */
+     attacks |= _king[pos->kingSquare[opponent]];
+ 
+@@ -838,14 +911,14 @@
+     sq = 0;
+     while(pawns != 0) {
+         if(LSB_SET(pawns)) {
+-            
++
+             if(WHITE == opponent) {
+                 attacks |= _wpawn_attack[sq];
+             }
+             else {
+                 attacks |= _bpawn_attack[sq];
+             }
+-        
++
+             /* incremental checking... */
+             if(attacks & target) {
+                 return 1;
+@@ -855,7 +928,7 @@
+         pawns = pawns >> 1;
+         sq++;
+     }
+-    
++
+ 
+     return 0;
+ }
+Index: src/move.h
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/src/move.h,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 move.h
+--- src/move.h	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ src/move.h	10 Oct 2005 11:14:39 -0000
+@@ -60,13 +60,14 @@
+     int promoteTo;      /* piece to promote the pawn to e.g. WHITE_QUEEN */
+     int thisPiece;      /* piece being moved e.g. WHITE_ROOK */
+     int capturedPiece;  /* captured piece e.g. BLACK_QUEEN */
+-    int eval;           /* evaluation of the move */ 
++    int eval;           /* evaluation of the move */
+ } move;
+ 
+ 
+ int inCheck(const position * const pos, const int player, const int targetSquare);
+ int getMoves(const position * const pos, const int player, const int piece, const int type, move store[]);
+ int playMove(const position * const pos, position *newPosition, const move * const m, const int player);
++int getAllMoves(const position * const pos, const int player, const int storeIndex);
+ 
+ #endif
+ 
+Index: src/position.h
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/src/position.h,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 position.h
+--- src/position.h	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ src/position.h	10 Oct 2005 11:12:19 -0000
+@@ -31,19 +31,21 @@
+  * The king of course, is invaluable, and the value
+  * is used only for the purpose of identification.
+  */
+-#define WHITE_KING    10
+-#define WHITE_QUEEN   9
+-#define WHITE_ROOK    5
+-#define WHITE_BISHOP  4
+-#define WHITE_KNIGHT  3
+-#define WHITE_PAWN    1
+-
+-#define BLACK_KING    -10
+-#define BLACK_QUEEN   -9
+-#define BLACK_ROOK    -5
+-#define BLACK_BISHOP  -4
+-#define BLACK_KNIGHT  -3
+-#define BLACK_PAWN    -1
++#define WHITE_KING    100
++#define WHITE_QUEEN   90
++#define WHITE_ROOK    50
++#define WHITE_BISHOP  32
++#define WHITE_KNIGHT  30
++#define WHITE_PAWN    10
++
++#define BLACK_KING    -100
++#define BLACK_QUEEN   -90
++#define BLACK_ROOK    -50
++#define BLACK_BISHOP  -32
++#define BLACK_KNIGHT  -30
++#define BLACK_PAWN    -10
++
++#define EVAL_CHECK    1000
+ 
+ /* castling flags */
+ #define CASTLE_WK       1 /* white may castle king side */
+Index: test/test_moves.c
+===================================================================
+RCS file: /cygdrive/d/Ashwin/CVSROOT/chess/test/test_moves.c,v
+retrieving revision 1.1.1.1
+diff -u -r1.1.1.1 test_moves.c
+--- test/test_moves.c	10 Oct 2005 06:23:46 -0000	1.1.1.1
++++ test/test_moves.c	10 Oct 2005 12:14:00 -0000
+@@ -32,34 +32,30 @@
+     int n;
+     int i;
+     position pos;
+-    position newPos;
++    /* position newPos; */
+ 
+     /* sample FEN */
+     /*char test1[] = "8/1n6/B3K1k1/8/8/8/1RR5/8 w - -";*/
+     /*char test1[] = "8/P7/4K1k1/8/8/P7/8/8 w - -";*/
+-    char test1[] = "1k6/8/8/2pP4/8/8/P4PPP/R3K2R w - c6";
++    char test1[] = "1k6/3P4/8/2pP4/8/8/P4PPP/R3K2R w KQ c6";
+ 
+     init();
+ 
+ 
+     loadPositionFromFEN(test1, &pos);
+     printPosition(&pos);
+-    
+-    n = getMoves(&pos, WHITE, WHITE_ROOK, NORMAL, &_moveStore[0][0]);
++
++    n = getAllMoves(&pos, WHITE, 0);
+     fprintf(stderr, "Number of moves: %d\n", n);
+ 
+     for(i = 0; i < n; i++) {
+         printMove(&_moveStore[0][i]);
+         fprintf(stderr, ", ");
+     }
+-    
++
+     fprintf(stderr, "\n");
+-    
+-    playMove(&pos, &newPos, &_moveStore[0][0], WHITE);
+-    printPosition(&newPos);
+-    
+-    
+-    
++
++
+     return 0;
+ }
+ 
